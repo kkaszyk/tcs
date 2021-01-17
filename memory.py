@@ -24,10 +24,6 @@ class Memory(MemSysComponent):
             if self.mem_queue[i][1] == 0:
                 self.return_load(self.mem_queue[i][0])
                 remove_list.append(i)
-            #    if self.compute_unit.caches[-1] != None:
-            #        self.logger.log("Handing over to cache L" + str(cu.caches[-1].level) + ".")
-            #        cu.caches[-1].complete_load(self.mem_queue[i][0])
-            #        address_list.append(self.mem_queue[i][0])
         
         for i in remove_list:
             self.mem_queue.pop(i)

@@ -69,12 +69,6 @@ class Cache(MemSysComponent):
             if self.mshr_bank.isMSHRAvailable():
                 self.mshr_bank.write(cache_line)
                 self.lower_load(address)
-                #if self.level < compute_unit.levels - 1:
-                #    compute_unit.caches[self.level+1].load(compute_unit, address)
-                #elif self.level == compute_unit.levels - 1:
-                #    compute_unit.memory.load(address)
-                #else:
-                #    self.logger.log("Error! Model has no upper level cache or memory.")
             else:
                 self.stall_queue.append(address)
 
