@@ -32,7 +32,7 @@ class Cache(MemSysComponent):
         self.active_queue = []
         self.stall_queue = []
         self.mshr_bank = MSHRBank(self.num_mshrs)
-        self.logger = Logger(self.name, logger_on)
+        self.logger = Logger(self.name, logger_on, self.mem_sys)
         
         # Cache Configuration
         self.tlb_size = 32

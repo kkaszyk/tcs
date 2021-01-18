@@ -1,8 +1,9 @@
 class Logger():
-    def __init__(self, name, on):
+    def __init__(self, name, on, sys):
         self.on = on
         self.name = name
+        self.sys = sys
         
     def log(self, string):
         if self.on:
-            print(self.name + ": " + str(string))
+            print(str(self.sys.clock) + ": " + self.name + ": " + str(string))

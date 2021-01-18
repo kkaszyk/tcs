@@ -7,7 +7,7 @@ class Memory(MemSysComponent):
         super().__init__("Memory", sys, lower_component_id)
         self.mem_queue = []
         self.latency = latency
-        self.logger = Logger(self.name, logger_on)
+        self.logger = Logger(self.name, logger_on, self.mem_sys)
         
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))

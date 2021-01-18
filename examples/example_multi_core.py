@@ -41,6 +41,6 @@ while i < 5:
 
 cu0.load(0x1002)
 i = 0
-while i < 100:
+while i < 15:
     sys.advance(1)
     i += 1

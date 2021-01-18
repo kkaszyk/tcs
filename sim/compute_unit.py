@@ -5,7 +5,7 @@ from util import Logger
 class ComputeUnit(MemSysComponent):
     def __init__(self, sys, user_id, logger_on, lower_component):
         super().__init__("Compute Unit " + str(user_id), sys, lower_component)
-        self.logger = Logger(self.name, logger_on)
+        self.logger = Logger(self.name, logger_on, self.mem_sys)
         self.waiting_mem = set()
 
     def load(self, address):

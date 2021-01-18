@@ -5,6 +5,7 @@ class MemSys():
         self.__cache_line_size = cache_line_size
         self.mem_trace = {}
         self.component_map = {}
+        self.clock = 0
         
     def build_map(self):
         for component in self.hierarchy:
@@ -41,6 +42,7 @@ class MemSys():
         self.hierarchy = hierarchy
 
     def advance(self, cycles):
+        self.clock += 1
         for unit in self.hierarchy:
             unit.advance(cycles)
 
