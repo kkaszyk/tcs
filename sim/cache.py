@@ -25,14 +25,14 @@ class MSHRBank():
         return self.mshrs.remove(address)
 
 class Cache(MemSysComponent):
-    def __init__(self, sys, level, num_mshrs, cache_size, line_size, latency, logger_on):
-        super().__init__("L" + str(level) + " Cache", sys)
+    def __init__(self, sys, user_id, level, num_mshrs, cache_size, line_size, latency, logger_on, lower_component):
+        super().__init__("L" + str(level) + " Cache " + str(user_id), sys, lower_component)
         self.level = level
         self.num_mshrs = num_mshrs
         self.active_queue = []
         self.stall_queue = []
         self.mshr_bank = MSHRBank(self.num_mshrs)
-        self.logger = Logger("L" + str(self.level) + " Cache", logger_on)
+        self.logger = Logger(self.name, logger_on)
         
         # Cache Configuration
         self.tlb_size = 32
@@ -46,12 +46,11 @@ class Cache(MemSysComponent):
         self.mem_queue = []
         
     def load(self, address):
-        self.logger.log("Load " + str(address))
+        self.logger.log("Load " + str(hex(address)))
         cache_line = address >> int(math.log(self.line_size) / math.log(2))
         hit = False
 
         for line in self.accesses:
-            self.logger.log(str(address) + " " + str(line) + " " + str(cache_line))
             if line == cache_line:
                 self.cache[0] += 1
                 self.accesses.remove(cache_line)
@@ -60,16 +59,17 @@ class Cache(MemSysComponent):
                 break
         
         if hit:
-            self.logger.log("Hit " + str(address))
+            self.logger.log("Hit " + str(hex(address)))
             self.mem_queue.append([address, self.latency])
         elif self.mshr_bank.isInMSHR(cache_line):
-            self.logger.log("Already waiting on memory access to cache line " + str(cache_line) + ".")
+            self.logger.log("Already waiting on memory access to cache line " + str(hex(cache_line)) + ".")
         else:
-            self.logger.log("Miss " + str(cache_line))
+            self.logger.log("Miss " + str(hex(cache_line)))
             if self.mshr_bank.isMSHRAvailable():
                 self.mshr_bank.write(cache_line)
                 self.lower_load(address)
             else:
+                self.logger.log("Stall " + str(hex(address)))
                 self.stall_queue.append(address)
 
     def complete_load(self, address):
@@ -85,6 +85,9 @@ class Cache(MemSysComponent):
 
             self.accesses.insert(0, cache_line)
         self.mem_queue.append([address, self.latency])
+
+        while self.mshr_bank.isMSHRAvailable() and len(self.stall_queue) > 0:
+            self.load(self.stall_queue.pop(0))
                 
     def advance(self, cycles):
         self.logger.log(self.mem_queue)
@@ -100,6 +103,7 @@ class Cache(MemSysComponent):
                 self.return_load(self.mem_queue[i][0])
                     
                 remove_list.append(i)
-        
+
+        remove_list.reverse()
         for i in remove_list:
             self.mem_queue.pop(i)
