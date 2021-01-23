@@ -3,11 +3,21 @@ from util import Logger
 from mem_sys import MemSysComponent
 
 class Memory(MemSysComponent):
-    def __init__(self, sys, latency, logger_on, lower_component_id):
+    def __init__(self, sys, latency, tfrs_per_clk, bit_width, clk_mhz, logger_on, lower_component_id):
         super().__init__("Memory", sys, lower_component_id)
         self.mem_queue = []
         self.latency = latency
         self.logger = Logger(self.name, logger_on, self.mem_sys)
+
+        self.tfrs_per_clk = tfrs_per_clk
+        self.bit_width = bit_width
+        self.clk_mhz = clk_mhz
+
+    def print_bandwidth(self):
+        bandwidth = self.clk_mhz * self.tfrs_per_clk * self.bit_width
+        print(str(bandwidth) + " Mbits/s")
+        print(str(bandwidth/self.bit_width) + " MT/s")
+        print(str(bandwidth/8/1000) + " GB/s")
         
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
