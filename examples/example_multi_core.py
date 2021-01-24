@@ -5,11 +5,11 @@ from memory import Memory
 
 sys = MemSys("Test Platform", 64)
 memory = Memory(sys, 10, 2, 64, 1866, True, None)
-l2c = Cache(sys, 0, 1, 16, 534288, 64, 3, True, memory.get_component_id())
-l1c0 = Cache(sys, 0, 0, 16, 16384, 64, 1, True, l2c.get_component_id())
-l1c1 = Cache(sys, 1, 0, 16, 16384, 64, 1, True, l2c.get_component_id())
-cu0 = ComputeUnit(sys, 0, True, l1c0.get_component_id())
-cu1 = ComputeUnit(sys, 1, True, l1c1.get_component_id())
+l2c = Cache(sys, 1037000, 0, 1, 16, 534288, 64, 3, True, memory.get_component_id())
+l1c0 = Cache(sys, 1037000, 0, 0, 16, 16384, 64, 1, True, l2c.get_component_id())
+l1c1 = Cache(sys, 1037000, 1, 0, 16, 16384, 64, 1, True, l2c.get_component_id())
+cu0 = ComputeUnit(sys, 1037000, 0, True, l1c0.get_component_id())
+cu1 = ComputeUnit(sys, 1037000, 1, True, l1c1.get_component_id())
 
 sys.build_map()
 print(sys.component_map)
@@ -45,3 +45,5 @@ i = 0
 while i < 15:
     sys.advance(1)
     i += 1
+
+sys.printclks()

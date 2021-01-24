@@ -3,8 +3,8 @@ from mem_sys import MemSysComponent
 from util import Logger
 
 class ComputeUnit(MemSysComponent):
-    def __init__(self, sys, user_id, logger_on, lower_component):
-        super().__init__("Compute Unit " + str(user_id), sys, lower_component)
+    def __init__(self, sys, clk, user_id, logger_on, lower_component):
+        super().__init__("Compute Unit " + str(user_id), clk, sys, lower_component)
         self.logger = Logger(self.name, logger_on, self.mem_sys)
         self.waiting_mem = set()
 
@@ -27,4 +27,4 @@ class ComputeUnit(MemSysComponent):
                 self.waiting_mem.remove(address)
         
     def advance(self, cycles):
-        pass
+        self.clk += cycles

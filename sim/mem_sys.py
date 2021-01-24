@@ -1,3 +1,5 @@
+import sys
+
 class MemSys():
     def __init__(self, name, cache_line_size):
         self.name = name
@@ -8,7 +10,9 @@ class MemSys():
         self.clock = 0
         
     def build_map(self):
+        smallest_tick = sys.maxsize
         for component in self.hierarchy:
+            smallest_tick = min(smallest_tick, component.clk_speed)
             higher = component.get_component_id()
             lower = component.get_lower_component_id()
             if lower != None and higher != None:
@@ -16,6 +20,11 @@ class MemSys():
                     self.component_map[lower].append(higher)
                 else:
                     self.component_map[lower] = [higher]
+
+        self.smallest_tick = smallest_tick
+        
+        for component in self.hierarchy:
+            component.set_unit_tick(smallest_tick)
             
     def insert_pair_into_mem_trace(self, target_id, source_id, address):
         if target_id in self.mem_trace.keys():
@@ -41,10 +50,10 @@ class MemSys():
     def set_hierarchy(self, hierarchy):
         self.hierarchy = hierarchy
 
-    def advance(self, cycles):
-        self.clock += 1
+    def advance(self, ticks):
         for unit in self.hierarchy:
-            unit.advance(cycles)
+            self.clock += 1
+            unit.advance(unit.unit_tick)
 
     def lower_load(self, address, source_id):
         target_id = self.hierarchy[source_id].get_lower_component_id()
@@ -59,13 +68,30 @@ class MemSys():
     def get_cache_line_size(self):
         return self.__cache_line_size
 
+    def printclks(self):
+        print("============")
+        print("Clocks:")
+        max_time = 0
+        for component in self.hierarchy:
+            print(component.name + ": " + str(int(component.clk)))
+            if max_time < component.clk / component.clk_speed:
+                max_time = component.clk / component.clk_speed
+
+        print(str(max_time) + " seconds elapsed")
+
 class MemSysComponent():
-    def __init__(self, name, mem_sys, lower_component):
+    def __init__(self, name, clk_speed, mem_sys, lower_component):
         self.name = name
         self.mem_sys = mem_sys
         self.mem_sys_component_id = mem_sys.append(self)
         self.mem_sys_lower_component_id = lower_component
+        self.clk_speed = clk_speed
+        self.clk = 0
 
+    def set_unit_tick(self, smallest_clk):
+        self.unit_tick = self.clk_speed / smallest_clk
+        print("Unit tick: " + str(self.unit_tick))
+        
     def get_component_id(self):
         return self.mem_sys_component_id
 

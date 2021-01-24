@@ -25,8 +25,8 @@ class MSHRBank():
         return self.mshrs.remove(address)
 
 class Cache(MemSysComponent):
-    def __init__(self, sys, user_id, level, num_mshrs, cache_size, line_size, latency, logger_on, lower_component):
-        super().__init__("L" + str(level) + " Cache " + str(user_id), sys, lower_component)
+    def __init__(self, sys, clk, user_id, level, num_mshrs, cache_size, line_size, latency, logger_on, lower_component):
+        super().__init__("L" + str(level) + " Cache " + str(user_id), clk, sys, lower_component)
         self.level = level
         self.num_mshrs = num_mshrs
         self.active_queue = []
@@ -90,13 +90,14 @@ class Cache(MemSysComponent):
             self.load(self.stall_queue.pop(0))
                 
     def advance(self, cycles):
+        self.clk += cycles
         self.logger.log(self.mem_queue)
         remove_list = []
         
         for i in range(len(self.mem_queue)):
             self.mem_queue[i][1] -= cycles
 
-            if self.mem_queue[i][1] == 0:
+            if self.mem_queue[i][1] <= 0:
                 self.logger.log("Handing over to " + self.mem_sys.hierarchy[self.mem_sys_component_id-1].name + ".")
 
                 cache_line = self.mem_queue[i][0] >> int(math.log(self.line_size) / math.log(2))
