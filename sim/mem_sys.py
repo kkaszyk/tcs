@@ -51,8 +51,8 @@ class MemSys():
         self.hierarchy = hierarchy
 
     def advance(self, ticks):
+        self.clock += 1
         for unit in self.hierarchy:
-            self.clock += 1
             unit.advance(unit.unit_tick)
 
     def lower_load(self, address, source_id):

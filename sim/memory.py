@@ -11,8 +11,8 @@ class Memory(MemSysComponent):
 
         self.tfrs_per_clk = tfrs_per_clk
         self.bit_width = bit_width
-        self.clk_speed = clk_speed
-        self.clk = 0 #MHz
+        self.clk_speed = clk_speed #MHz
+        self.clk = 0 
 
     def print_bandwidth(self):
         bandwidth = self.clk_speed * self.tfrs_per_clk * self.bit_width
