@@ -12,6 +12,7 @@ class ComputeUnit(MemSysComponent):
         self.logger.log("Load " + str(hex(address)))
         self.lower_load(address)
         self.waiting_mem.add(address)
+        self.is_idle = False
 
     def complete_load(self, address):
         cache_line = address >> int(math.log(self.mem_sys.get_cache_line_size()) / math.log(2))        
@@ -25,6 +26,9 @@ class ComputeUnit(MemSysComponent):
         for address in clear_addrs:
             if address in self.waiting_mem:
                 self.waiting_mem.remove(address)
+
+        if len(self.waiting_mem) == 0:
+            self.is_idle = True
         
     def advance(self, cycles):
         self.clk += cycles

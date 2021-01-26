@@ -24,6 +24,7 @@ class Memory(MemSysComponent):
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
         self.mem_queue.append([address, self.latency])
+        self.is_idle = False
 
     def advance(self, cycles):
         self.clk += cycles
@@ -45,4 +46,6 @@ class Memory(MemSysComponent):
             print(i)
             self.mem_queue.pop(i)
 
+        if len(self.mem_queue):
+            self.is_idle = True
         return address_list

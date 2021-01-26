@@ -8,6 +8,7 @@ class MemSys():
         self.mem_trace = {}
         self.component_map = {}
         self.clock = 0
+        self.eos = False
         
     def build_map(self):
         smallest_tick = sys.maxsize
@@ -52,8 +53,16 @@ class MemSys():
 
     def advance(self, ticks):
         self.clock += 1
+        idle_count = 0
         for unit in self.hierarchy:
             unit.advance(unit.unit_tick)
+            if unit.is_idle:
+                idle_count +=1
+
+        if idle_count == len(self.hierarchy) and self.eos:
+            self.printclks()
+            print("Finishing Simulation")
+            sys.exit()
 
     def lower_load(self, address, source_id):
         target_id = self.hierarchy[source_id].get_lower_component_id()
@@ -79,6 +88,9 @@ class MemSys():
 
         print(str(max_time) + " seconds elapsed")
 
+    def end_sim(self):
+        self.eos = True
+
 class MemSysComponent():
     def __init__(self, name, clk_speed, mem_sys, lower_component):
         self.name = name
@@ -87,7 +99,11 @@ class MemSysComponent():
         self.mem_sys_lower_component_id = lower_component
         self.clk_speed = clk_speed
         self.clk = 0
-
+        self.is_idle = True
+        
+    def is_idle():
+        return self.is_idle
+        
     def set_unit_tick(self, smallest_clk):
         self.unit_tick = self.clk_speed / smallest_clk
         print("Unit tick: " + str(self.unit_tick))

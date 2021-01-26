@@ -47,6 +47,7 @@ class Cache(MemSysComponent):
         
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
+        self.is_idle = False
         cache_line = address >> int(math.log(self.line_size) / math.log(2))
         hit = False
 
@@ -88,7 +89,7 @@ class Cache(MemSysComponent):
 
         while self.mshr_bank.isMSHRAvailable() and len(self.stall_queue) > 0:
             self.load(self.stall_queue.pop(0))
-                
+
     def advance(self, cycles):
         self.clk += cycles
         self.logger.log(self.mem_queue)
@@ -108,3 +109,6 @@ class Cache(MemSysComponent):
         remove_list.reverse()
         for i in remove_list:
             self.mem_queue.pop(i)
+
+        if len(self.mem_queue) == 0 and self.mshr_bank.isMSHRAvailable():
+            self.is_idle = True
