@@ -7,6 +7,7 @@ class ComputeUnit(MemSysComponent):
         super().__init__("Compute Unit " + str(user_id), clk, sys, lower_component)
         self.logger = Logger(self.name, logger_on, self.mem_sys)
         self.waiting_mem = set()
+        self.store_queue = []
 
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
@@ -14,6 +15,10 @@ class ComputeUnit(MemSysComponent):
         self.waiting_mem.add(address)
         self.is_idle = False
 
+    def store(self, address):
+        self.logger.log("Store " + str(hex(address)))
+        self.lower_store(address)
+        
     def complete_load(self, address):
         cache_line = address >> int(math.log(self.mem_sys.get_cache_line_size()) / math.log(2))        
         clear_addrs = []
@@ -29,6 +34,6 @@ class ComputeUnit(MemSysComponent):
 
         if len(self.waiting_mem) == 0:
             self.is_idle = True
-        
+
     def advance(self, cycles):
         self.clk += cycles

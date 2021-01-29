@@ -1,3 +1,4 @@
+
 import sys
 
 class MemSys():
@@ -34,22 +35,47 @@ class MemSys():
     def set_hierarchy(self, hierarchy):
         self.hierarchy = hierarchy
 
-    def advance(self, ticks):
-        self.clock += 1
+    def get_idle_count(self):
         idle_count = 0
         for unit in self.hierarchy:
-            unit.advance(unit.unit_tick)
             if unit.is_idle:
                 idle_count +=1
 
-        if idle_count == len(self.hierarchy) and self.eos:
-            self.printclks()
-            print("Finishing Simulation")
-            sys.exit()
+        return idle_count
+        
+    def advance(self, ticks):
+        self.clock += 1
 
+        for unit in self.hierarchy:
+            unit.advance(unit.unit_tick)
+        
+        if self.get_idle_count() == len(self.hierarchy) and self.eos:
+            self.prepare_end_sim()
+
+    def complete_sim(self):
+        self.printclks()
+        print("Finishing Simulation")
+        sys.exit()
+        
+    def prepare_end_sim(self):
+        self.ending = True
+        self.eos = False
+        
+        for e in self.hierarchy:
+            e.flush()
+
+        while self.get_idle_count() != len(self.hierarchy):
+            self.advance(1)
+
+        self.complete_sim()
+            
     def lower_load(self, address, source_id):
         target_id = self.hierarchy[source_id].get_lower_component_id()
         self.hierarchy[target_id].load(address)
+
+    def lower_store(self, address, source_id):
+        target_id = self.hierarchy[source_id].get_lower_component_id()
+        self.hierarchy[target_id].store(address)
 
     def return_load(self, address, source_id):
         for lower_id in self.component_map[source_id]:
@@ -88,7 +114,6 @@ class MemSysComponent():
         
     def set_unit_tick(self, smallest_clk):
         self.unit_tick = self.clk_speed / smallest_clk
-        print("Unit tick: " + str(self.unit_tick))
         
     def get_component_id(self):
         return self.mem_sys_component_id
@@ -99,5 +124,11 @@ class MemSysComponent():
     def lower_load(self, address):
         self.mem_sys.lower_load(address, self.mem_sys_component_id)
 
+    def lower_store(self, address):
+        self.mem_sys.lower_store(address, self.mem_sys_component_id)
+
     def return_load(self, address):
         self.mem_sys.return_load(address, self.mem_sys_component_id)
+
+    def flush(self):
+        pass
