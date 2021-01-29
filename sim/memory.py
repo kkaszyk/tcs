@@ -3,15 +3,15 @@ from util import Logger
 from mem_sys import MemSysComponent
 
 class Memory(MemSysComponent):
-    def __init__(self, sys, latency, max_parallel_reads, max_parallel_writes, tfrs_per_clk, bit_width, clk_speed, logger_on, lower_component_id):
+    def __init__(self, sys, latency, max_parallel_loads, max_parallel_stores, tfrs_per_clk, bit_width, clk_speed, logger_on, lower_component_id):
         super().__init__("Memory", clk_speed, sys, lower_component_id)
         self.load_mem_queue = []
         self.store_mem_queue = []
         self.latency = latency
         self.logger = Logger(self.name, logger_on, self.mem_sys)
 
-        self.max_parallel_reads = max_parallel_reads
-        self.max_parallel_writes = max_parallel_writes
+        self.max_parallel_loads = max_parallel_loads
+        self.max_parallel_stores = max_parallel_stores
         self.tfrs_per_clk = tfrs_per_clk
         self.bit_width = bit_width
         self.clk_speed = clk_speed #MHz
@@ -38,7 +38,7 @@ class Memory(MemSysComponent):
 
         remove_list = []
 
-        for i in range(self.max_parallel_reads):
+        for i in range(self.max_parallel_loads):
             if i < len(self.load_mem_queue):
                 self.load_mem_queue[i][1] = self.load_mem_queue[i][1] - cycles
                 if self.load_mem_queue[i][1] <= 0:
@@ -54,7 +54,7 @@ class Memory(MemSysComponent):
 
         remove_list = []
 
-        for i in range(self.max_parallel_writes):
+        for i in range(self.max_parallel_stores):
             if i < len(self.store_mem_queue):
                 self.store_mem_queue[i][1] = self.store_mem_queue[i][1] - cycles
                 if self.store_mem_queue[i][1] <= 0:
