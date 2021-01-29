@@ -27,23 +27,6 @@ class MemSys():
         for component in self.hierarchy:
             component.set_unit_tick(smallest_tick)
             
-    def insert_pair_into_mem_trace(self, target_id, source_id, address):
-        if target_id in self.mem_trace.keys():
-            self.mem_trace[target_id].append((source_id,address))
-        else:
-            self.mem_trace[target_id] = [(source_id, address)]
-        
-    def retrieve_target_from_mem_trace(self, source_id, address):
-        ret = -1
-        if source_id in self.mem_trace.keys():
-            for (target_id, addr) in self.mem_trace[source_id]:
-                if address == addr:
-                    ret = target_id
-                    break
-                
-        assert ret != -1, "No target found when retrieving pair from mem_trace"
-        return ret
-            
     def append(self, component):
         self.hierarchy.append(component)
         return len(self.hierarchy) - 1
@@ -66,7 +49,6 @@ class MemSys():
 
     def lower_load(self, address, source_id):
         target_id = self.hierarchy[source_id].get_lower_component_id()
-        self.insert_pair_into_mem_trace(target_id, source_id, address)
         self.hierarchy[target_id].load(address)
 
     def return_load(self, address, source_id):
