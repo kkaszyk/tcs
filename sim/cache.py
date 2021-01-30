@@ -46,11 +46,18 @@ class Cache(MemSysComponent):
         self.cache = [0,0]
         self.load_queue = []
         self.store_queue = []
+
+        self.offset_bits = int(math.log2(self.line_size))
+        self.word_size = 64
+        self.byte_addressable = True
+
+    def get_cache_line(self, address):
+        return address >> self.offset_bits
     
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
         self.is_idle = False
-        cache_line = address >> int(math.log(self.line_size) / math.log(2))
+        cache_line = self.get_cache_line(address)
         hit = False
 
         for line in self.accesses:
@@ -84,7 +91,7 @@ class Cache(MemSysComponent):
             self.store_stall_queue.append(address)
         
     def complete_store(self, address):
-        cache_line = int(address) >> int(math.log(self.line_size) / math.log(2))
+        cache_line = self.get_cache_line(address)
         hit = False
 
         for line in self.accesses:
@@ -104,7 +111,7 @@ class Cache(MemSysComponent):
                 self.lower_store(address << int(math.log(self.line_size) / math.log(2)))
                              
     def complete_load(self, address):
-        cache_line = address >> int(math.log(self.line_size) / math.log(2))
+        cache_line = self.get_cache_line(address)
 
         if self.load_mshr_bank.isInMSHR(cache_line):
             self.load_mshr_bank.clear(cache_line)
