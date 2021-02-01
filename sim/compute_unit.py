@@ -6,7 +6,7 @@ from cache import Cache
 class ComputeUnit(MemSysComponent):
     def __init__(self, sys, clk, user_id, logger_on, lower_component):
         super().__init__("Compute Unit " + str(user_id), clk, sys, lower_component)
-        self.logger = Logger(self.name, logger_on, self.mem_sys)
+        self.logger = Logger(self.name, logger_on, self.sys)
         self.waiting_mem = set()
         self.store_queue = []
 
@@ -21,10 +21,10 @@ class ComputeUnit(MemSysComponent):
         self.lower_store(address)
         
     def complete_load(self, address):
-        cache_line = address >> int(math.log(self.mem_sys.get_cache_line_size()) / math.log(2))        
+        cache_line = address >> int(math.log(self.sys.get_cache_line_size()) / math.log(2))        
         clear_addrs = []
         for waiting_address in self.waiting_mem:
-            waiting_cache_line = waiting_address >> int(math.log(self.mem_sys.get_cache_line_size()) / math.log(2)) 
+            waiting_cache_line = waiting_address >> int(math.log(self.sys.get_cache_line_size()) / math.log(2)) 
             if waiting_cache_line == cache_line:
                 self.logger.log(("Data from " + str(hex(waiting_address)) + " available."))
                 clear_addrs.append(waiting_address)
@@ -45,4 +45,4 @@ class Core():
         self.compute_units = []
         self.l1c = Cache(sys, clk, core_id, 0, 16, 8, 16384, 64, 1, logger_on, l2c_component_id)
         for i in range(num_compute_units):
-            self.compute_units.append(ComputeUnit(sys, clk, i, logger_on, l1c.get_component_id()))
+            self.compute_units.append(ComputeUnit(sys, clk, i, logger_on, self.l1c.get_component_id()))

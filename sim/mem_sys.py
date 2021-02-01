@@ -1,5 +1,6 @@
 
 import sys
+from component import Component
 
 class MemSys():
     def __init__(self, name, cache_line_size):
@@ -96,36 +97,19 @@ class MemSys():
     def end_sim(self):
         self.eos = True
 
-class MemSysComponent():
-    def __init__(self, name, clk_speed, mem_sys, lower_component):
-        self.name = name
-        self.mem_sys = mem_sys
-        self.mem_sys_component_id = mem_sys.append(self)
-        self.mem_sys_lower_component_id = lower_component
-        self.clk_speed = clk_speed
-        self.clk = 0
-        self.is_idle = True
-        
-    def is_idle():
-        return self.is_idle
-        
-    def set_unit_tick(self, smallest_clk):
-        self.unit_tick = self.clk_speed / smallest_clk
-        
-    def get_component_id(self):
-        return self.mem_sys_component_id
+class MemSysComponent(Component):
+    def __init__(self, name, clk_speed, sys, lower_component):
+        super().__init__(name, clk_speed, sys)
+        self.sys_lower_component_id = lower_component
 
     def get_lower_component_id(self):
-        return self.mem_sys_lower_component_id
+        return self.sys_lower_component_id
 
     def lower_load(self, address):
-        self.mem_sys.lower_load(address, self.mem_sys_component_id)
+        self.sys.lower_load(address, self.sys_component_id)
 
     def lower_store(self, address):
-        self.mem_sys.lower_store(address, self.mem_sys_component_id)
+        self.sys.lower_store(address, self.sys_component_id)
 
     def return_load(self, address):
-        self.mem_sys.return_load(address, self.mem_sys_component_id)
-
-    def flush(self):
-        pass
+        self.sys.return_load(address, self.sys_component_id)

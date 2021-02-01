@@ -8,7 +8,7 @@ class Memory(MemSysComponent):
         self.load_mem_queue = []
         self.store_mem_queue = []
         self.latency = latency
-        self.logger = Logger(self.name, logger_on, self.mem_sys)
+        self.logger = Logger(self.name, logger_on, self.sys)
 
         self.max_parallel_loads = max_parallel_loads
         self.max_parallel_stores = max_parallel_stores

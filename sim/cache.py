@@ -33,7 +33,7 @@ class Cache(MemSysComponent):
         self.load_stall_queue = []
         self.store_stall_queue = []
         self.load_mshr_bank = MSHRBank(self.num_load_mshrs)
-        self.logger = Logger(self.name, logger_on, self.mem_sys)
+        self.logger = Logger(self.name, logger_on, self.sys)
         
         # Cache Configuration
         self.tlb_size = 32
@@ -140,7 +140,7 @@ class Cache(MemSysComponent):
             self.load_queue[i][1] -= cycles
 
             if self.load_queue[i][1] <= 0:
-                self.logger.log("Handing over to " + self.mem_sys.hierarchy[self.mem_sys_component_id-1].name + ".")
+                self.logger.log("Handing over to " + self.sys.hierarchy[self.sys_component_id-1].name + ".")
 
                 cache_line = self.load_queue[i][0] >> int(math.log(self.line_size) / math.log(2))
                 self.return_load(self.load_queue[i][0])
