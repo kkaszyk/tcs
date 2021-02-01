@@ -1,9 +1,9 @@
-from mem_sys import MemSys, MemSysComponent
+from system import Sys, MemSysComponent
 from compute_unit import ComputeUnit
 from cache import Cache
 from memory import Memory
 
-sys = MemSys("Test Platform", 64)
+sys = Sys("Test Platform", 64)
 memory = Memory(sys, 4, 4, 4, 2, 64, 1866, True, None)
 l2c = Cache(sys, 1037000, 0, 1, 16, 8, 534288, 64, 3, True, memory.get_component_id())
 l1c0 = Cache(sys, 1037000, 0, 0, 16, 8, 16384, 64, 1, True, l2c.get_component_id())

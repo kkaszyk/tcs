@@ -1,5 +1,5 @@
 import math
-from mem_sys import MemSysComponent
+from system import MemSysComponent
 from util import Logger
 from cache import Cache
 

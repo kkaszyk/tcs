@@ -1,6 +1,6 @@
 import math
 from util import Logger
-from mem_sys import MemSysComponent
+from system import MemSysComponent
 
 class Memory(MemSysComponent):
     def __init__(self, sys, latency, max_parallel_loads, max_parallel_stores, tfrs_per_clk, bit_width, clk_speed, logger_on, lower_component_id):

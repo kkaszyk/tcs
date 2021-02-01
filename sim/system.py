@@ -2,7 +2,7 @@
 import sys
 from component import Component
 
-class MemSys():
+class Sys():
     def __init__(self, name, cache_line_size):
         self.name = name
         self.hierarchy = []
