@@ -31,9 +31,6 @@ class MemSys():
     def append(self, component):
         self.hierarchy.append(component)
         return len(self.hierarchy) - 1
-        
-    def set_hierarchy(self, hierarchy):
-        self.hierarchy = hierarchy
 
     def get_idle_count(self):
         idle_count = 0

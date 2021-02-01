@@ -1,6 +1,7 @@
 import math
 from mem_sys import MemSysComponent
 from util import Logger
+from cache import Cache
 
 class ComputeUnit(MemSysComponent):
     def __init__(self, sys, clk, user_id, logger_on, lower_component):
@@ -37,3 +38,11 @@ class ComputeUnit(MemSysComponent):
 
     def advance(self, cycles):
         self.clk += cycles
+
+class Core():
+    def __init__(self, core_id, num_compute_units, sys, clk, logger_on, l2c_component_id):
+        self.core_id = core_id
+        self.compute_units = []
+        self.l1c = Cache(sys, clk, core_id, 0, 16, 8, 16384, 64, 1, logger_on, l2c_component_id)
+        for i in range(num_compute_units):
+            self.compute_units.append(ComputeUnit(sys, clk, i, logger_on, l1c.get_component_id()))
