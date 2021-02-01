@@ -99,11 +99,7 @@ class Sys():
 
 class MemSysComponent(Component):
     def __init__(self, name, clk_speed, sys, lower_component):
-        super().__init__(name, clk_speed, sys)
-        self.sys_lower_component_id = lower_component
-
-    def get_lower_component_id(self):
-        return self.sys_lower_component_id
+        super().__init__(name, clk_speed, sys, lower_component)
 
     def lower_load(self, address):
         self.sys.lower_load(address, self.sys_component_id)

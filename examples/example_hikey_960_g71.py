@@ -8,7 +8,7 @@ memory = Memory(sys, 4, 4, 4, 2, 64, 1866, True, None)
 l2c = Cache(sys, 1037000, 0, 1, 16, 8, 534288, 64, 3, True, memory.get_component_id())
 cores = []
 for i in range(8):
-    cores.append(Core(i, 3, sys, 1037000, True, l2c.get_component_id()))
+    cores.append(Core(i, 3, sys, 1037000, True, None, l2c.get_component_id()))
 
 sys.build_map()
 sys.end_sim()
