@@ -1,6 +1,6 @@
 import math
 
-from system import MemSysComponent
+from component import MemSysComponent
 from util import Logger
 
 class MSHRBank():
@@ -25,8 +25,8 @@ class MSHRBank():
         return self.mshrs.remove(address)
 
 class Cache(MemSysComponent):
-    def __init__(self, sys, clk, user_id, level, num_load_mshrs, num_parallel_stores, cache_size, line_size, latency, logger_on, lower_component):
-        super().__init__("L" + str(level) + " Cache " + str(user_id), clk, sys, lower_component)
+    def __init__(self, sys, clk, user_id, level, num_load_mshrs, num_parallel_stores, cache_size, line_size, latency, logger_on, parent_component_id, child_component_id):
+        super().__init__("L" + str(level) + " Cache " + str(user_id), clk, sys, parent_component_id, child_component_id)
         self.level = level
         self.num_load_mshrs = num_load_mshrs
         self.num_parallel_stores = num_parallel_stores
@@ -53,6 +53,16 @@ class Cache(MemSysComponent):
 
     def get_cache_line(self, address):
         return address >> self.offset_bits
+
+    def peek(self, address):
+        cache_line = self.get_cache_line(address)
+        hit = False
+
+        for line in self.accesses:
+            if line == cache_line:
+                return True
+
+        return False
     
     def load(self, address):
         self.logger.log("Load " + str(hex(address)))
@@ -111,6 +121,7 @@ class Cache(MemSysComponent):
                 self.lower_store(address << int(math.log(self.line_size) / math.log(2)))
                              
     def complete_load(self, address):
+        self.logger.log("Completing load: " + str(hex(address)))
         cache_line = self.get_cache_line(address)
 
         if self.load_mshr_bank.isInMSHR(cache_line):
@@ -133,14 +144,15 @@ class Cache(MemSysComponent):
             self.load(self.load_stall_queue.pop(0))
 
     def advance_load(self, cycles):
-        self.logger.log(self.load_queue)
+        self.logger.log([(hex(a),c) for (a,c) in self.load_queue])
         remove_list = []
         
         for i in range(len(self.load_queue)):
             self.load_queue[i][1] -= cycles
 
             if self.load_queue[i][1] <= 0:
-                self.logger.log("Handing over to " + self.sys.hierarchy[self.sys_component_id-1].name + ".")
+                for cid in self.parent_component:
+                    self.logger.log("Handing over to " + self.sys.hierarchy[cid].name + ".")
 
                 cache_line = self.load_queue[i][0] >> int(math.log(self.line_size) / math.log(2))
                 self.return_load(self.load_queue[i][0])

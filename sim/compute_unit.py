@@ -48,3 +48,16 @@ class Core(SchedComponent):
         self.l1c = Cache(sys, clk, core_id, 0, 16, 8, 16384, 64, 1, logger_on, lower_mem_id)
         for i in range(num_compute_units):
             self.compute_units.append(ComputeUnit(sys, clk, i, logger_on, self.l1c.get_component_id()))
+
+        self.__is_idle = True
+        self.threadgroup = None
+        
+    def is_idle(self):
+        return self.__is_idle
+
+    def schedule(self, threadgroup):
+        pass
+
+    def complete_from_lower(self):
+        pass
+        
