@@ -1,4 +1,4 @@
-
+ 
 import sys
 from component import Component
 
@@ -8,26 +8,27 @@ class Sys():
         self.hierarchy = []
         self.__cache_line_size = cache_line_size
         self.mem_trace = {}
-        self.component_map = {}
         self.clock = 0
         self.eos = False
+
+    def print_hierarchy(self):
+        print("HIERARCHY:")
+        for c in self.hierarchy:
+            print(c.name)
+            if c.parent_component != None:
+                for p in c.get_parent_component_id():
+                    print("   " + str(self.hierarchy[p].name))
+        print("==========")
         
     def build_map(self):
-        smallest_tick = sys.maxsize
+        largest_tick = 0
         for component in self.hierarchy:
-            smallest_tick = min(smallest_tick, component.clk_speed)
-            higher = component.get_component_id()
-            lower = component.get_lower_component_id()
-            if lower != None and higher != None:
-                if lower in self.component_map.keys():
-                    self.component_map[lower].append(higher)
-                else:
-                    self.component_map[lower] = [higher]
+            largest_tick = max(largest_tick, component.clk_speed)
 
-        self.smallest_tick = smallest_tick
+        self.largest_tick = largest_tick
         
         for component in self.hierarchy:
-            component.set_unit_tick(smallest_tick)
+            component.set_unit_tick(largest_tick)
             
     def append(self, component):
         self.hierarchy.append(component)
@@ -50,6 +51,9 @@ class Sys():
         if self.get_idle_count() == len(self.hierarchy) and self.eos:
             self.prepare_end_sim()
 
+    def stall(self, sched_item):
+        pass
+    
     def complete_sim(self):
         self.printclks()
         print("Finishing Simulation")
@@ -68,16 +72,15 @@ class Sys():
         self.complete_sim()
             
     def lower_load(self, address, source_id):
-        target_id = self.hierarchy[source_id].get_lower_component_id()
+        target_id = self.hierarchy[source_id].get_child_component_id()[0]
         self.hierarchy[target_id].load(address)
 
     def lower_store(self, address, source_id):
-        target_id = self.hierarchy[source_id].get_lower_component_id()
+        target_id = self.hierarchy[source_id].get_child_component_id()[0]
         self.hierarchy[target_id].store(address)
 
     def return_load(self, address, source_id):
-        for lower_id in self.component_map[source_id]:
-            print("Sending from " + self.hierarchy[source_id].name + " to " + self.hierarchy[lower_id].name)
+        for lower_id in self.hierarchy[source_id].get_parent_component_id():
             self.hierarchy[lower_id].complete_load(address)
 
     def get_cache_line_size(self):
@@ -96,16 +99,3 @@ class Sys():
 
     def end_sim(self):
         self.eos = True
-
-class MemSysComponent(Component):
-    def __init__(self, name, clk_speed, sys, lower_component):
-        super().__init__(name, clk_speed, sys, lower_component)
-
-    def lower_load(self, address):
-        self.sys.lower_load(address, self.sys_component_id)
-
-    def lower_store(self, address):
-        self.sys.lower_store(address, self.sys_component_id)
-
-    def return_load(self, address):
-        self.sys.return_load(address, self.sys_component_id)

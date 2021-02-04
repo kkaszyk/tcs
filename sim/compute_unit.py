@@ -1,8 +1,7 @@
 import math
-from system import MemSysComponent
 from util import Logger
 from cache import Cache
-from component import SchedComponent
+from component import SchedComponent, MemSysComponent
 
 class ComputeUnit(MemSysComponent):
     def __init__(self, sys, clk, user_id, logger_on, lower_component):
@@ -22,6 +21,7 @@ class ComputeUnit(MemSysComponent):
         self.lower_store(address)
         
     def complete_load(self, address):
+        self.logger.log("Completing load: " + str(address))
         cache_line = address >> int(math.log(self.sys.get_cache_line_size()) / math.log(2))        
         clear_addrs = []
         for waiting_address in self.waiting_mem:

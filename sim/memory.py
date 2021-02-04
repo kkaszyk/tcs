@@ -1,10 +1,10 @@
 import math
 from util import Logger
-from system import MemSysComponent
+from component import MemSysComponent
 
 class Memory(MemSysComponent):
-    def __init__(self, sys, latency, max_parallel_loads, max_parallel_stores, tfrs_per_clk, bit_width, clk_speed, logger_on, lower_component_id):
-        super().__init__("Memory", clk_speed, sys, lower_component_id)
+    def __init__(self, sys, latency, max_parallel_loads, max_parallel_stores, tfrs_per_clk, bit_width, clk_speed, logger_on, parent_component_id, child_component_id):
+        super().__init__("Memory", clk_speed, sys, parent_component_id, child_component_id)
         self.load_mem_queue = []
         self.store_mem_queue = []
         self.latency = latency
@@ -34,7 +34,7 @@ class Memory(MemSysComponent):
         self.is_idle = False
 
     def advance_load(self, cycles):
-        self.logger.log("Load " + str(self.load_mem_queue))
+        self.logger.log("Load " + str([(hex(a),c) for (a,c) in self.load_mem_queue]))
 
         remove_list = []
 
