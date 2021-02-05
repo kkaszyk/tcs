@@ -95,7 +95,7 @@ class Sys():
             if max_time < component.clk / component.clk_speed:
                 max_time = component.clk / component.clk_speed
 
-        print(str(max_time * 1e9) + " ns elapsed")
+        print(str(round(max_time * 1e9)) + " ns elapsed")
 
     def end_sim(self):
         self.eos = True
