@@ -8,8 +8,12 @@ class Component():
         self.is_idle = True
         self.parent_component = parent_component_id
         self.child_component = child_component_id
-        self.clock = 0
+        #self.clock = 0
 
+    def reset(self):
+        self.clk = 0
+        self.is_idle = True
+        
     def set_child_component(self, child_component):
         self.child_component = child_component
 
@@ -41,7 +45,8 @@ class Component():
         pass
 
     def advance(self, cycles):
-        self.clock += cycles
+        #self.clock += cycles
+        self.clk += cycles
 
 class SchedComponent(Component):
     def __init__(self, name, clk_speed, sys, parent_component_id, child_component_id):

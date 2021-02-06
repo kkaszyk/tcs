@@ -50,15 +50,23 @@ class Sys():
         
         if self.get_idle_count() == len(self.hierarchy) and self.eos:
             self.prepare_end_sim()
-
+            return 1
+        else:
+            return 0
+        
     def stall(self, sched_item):
         pass
     
     def complete_sim(self):
         self.printclks()
         print("Finishing Simulation")
-        sys.exit()
-        
+
+    def reset(self):
+        self.eos = 0
+        self.clock = 0
+        for e in self.hierarchy:
+            e.reset()
+
     def prepare_end_sim(self):
         self.ending = True
         self.eos = False
@@ -86,16 +94,20 @@ class Sys():
     def get_cache_line_size(self):
         return self.__cache_line_size
 
-    def printclks(self):
-        print("============")
-        print("Clocks:")
+    def get_clk_time(self):
         max_time = 0
         for component in self.hierarchy:
-            print(component.name + ": " + str(int(component.clk)))
+            #print(component.name + ": " + str(int(component.clk)))
             if max_time < component.clk / component.clk_speed:
                 max_time = component.clk / component.clk_speed
 
-        print(str(round(max_time * 1e9)) + " ns elapsed")
+        return (round(max_time * 1e9))
+    
+    def printclks(self):
+        print("============")
+        print("Clocks:")
+        max_time = self.get_clk_time()
+        print(str(max_time) + " ns elapsed")
 
     def end_sim(self):
         self.eos = True

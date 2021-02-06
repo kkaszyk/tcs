@@ -51,6 +51,16 @@ class Cache(MemSysComponent):
         self.word_size = 64
         self.byte_addressable = True
 
+    def reset(self):
+        self.load_stall_queue = []
+        self.store_stall_queue = []
+        self.load_mshr_bank.mshrs = []
+        self.accesses = []
+        self.cache = [0,0]
+        self.load_queue = []
+        self.store_queue = []
+        super().reset()
+        
     def get_cache_line(self, address):
         return address >> self.offset_bits
 

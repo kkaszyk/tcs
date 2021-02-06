@@ -17,6 +17,11 @@ class Memory(MemSysComponent):
         self.clk_speed = clk_speed #MHz
         self.clk = 0
 
+    def reset(self):
+        self.load_mem_queue = []
+        self.store_mem_queue = []
+        super().reset()
+        
     def print_bandwidth(self):
         bandwidth = self.clk_speed * self.tfrs_per_clk * self.bit_width
         print(str(bandwidth) + " Mbits/s")
