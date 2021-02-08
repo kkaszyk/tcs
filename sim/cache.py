@@ -145,8 +145,8 @@ class Cache(MemSysComponent):
             self.accesses.insert(0, cache_line)
 
             if len(self.accesses) > self.max_size:
-                address = self.accesses.pop()
-                self.lower_store(address << int(math.log(self.line_size) / math.log(2)))
+                evict_address = self.accesses.pop()
+                self.lower_store(evict_address << int(math.log(self.line_size) / math.log(2)))
                 
         self.load_queue.append([address, self.latency])
 
